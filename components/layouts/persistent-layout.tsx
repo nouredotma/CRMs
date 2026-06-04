@@ -240,7 +240,7 @@ const SidebarNavItem = ({
   const isActive = pathname === item.path
   
   return (
-    <Link href={item.path} className="block">
+    <Link href={item.path} prefetch className="block">
       <Button
         variant={isActive ? "secondary" : "ghost"}
         className={cn(
@@ -309,7 +309,7 @@ const UserProfileSection = ({
             asChild
             className="cursor-pointer hover:bg-black/5 focus:bg-black/5 rounded-lg py-2.5 transition-colors"
           >
-            <Link href="/settings" className="flex items-center gap-2.5 w-full">
+            <Link href="/settings" prefetch className="flex items-center gap-2.5 w-full">
               <Settings className="h-4.5 w-4.5 text-black/60" />
               <span className="text-sm font-medium">Settings</span>
             </Link>
@@ -318,7 +318,7 @@ const UserProfileSection = ({
             asChild
             className="cursor-pointer hover:bg-black/5 focus:bg-black/5 rounded-lg py-2.5 transition-colors"
           >
-            <Link href="/users" className="flex items-center gap-2.5 w-full">
+            <Link href="/users" prefetch className="flex items-center gap-2.5 w-full">
               <Users2 className="h-4.5 w-4.5 text-black/60" />
               <span className="text-sm font-medium">Team Management</span>
             </Link>
@@ -327,7 +327,7 @@ const UserProfileSection = ({
             asChild
             className="cursor-pointer hover:bg-black/5 focus:bg-black/5 rounded-lg py-2.5 transition-colors"
           >
-            <Link href="/my-space" className="flex items-center gap-2.5 w-full">
+            <Link href="/my-space" prefetch className="flex items-center gap-2.5 w-full">
               <FolderOpen className="h-4.5 w-4.5 text-black/60" />
               <span className="text-sm font-medium">My Space</span>
             </Link>
@@ -377,11 +377,7 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
   const isDashboardPath = !isAuthPage
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 2000)
-
-    return () => clearTimeout(timer)
+    setLoading(false)
   }, [])
 
   useEffect(() => {
