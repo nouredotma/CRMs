@@ -55,7 +55,7 @@ export function ModernLineChart({
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 pb-4">
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
+        <ChartContainer config={chartConfig} className="h-[200px] w-full min-h-[200px]">
           <AreaChart
             accessibilityLayer
             data={data}

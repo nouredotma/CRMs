@@ -274,7 +274,7 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="p-4 pt-4 pb-0">
-              <ChartContainer config={chartConfig} className="h-[240px] w-full [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-primary/20">
+              <ChartContainer config={chartConfig} className="h-[240px] min-h-[240px] w-full min-w-0 [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-primary/20">
                 <BarChart data={revenueChartData}>
                   <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                   <XAxis

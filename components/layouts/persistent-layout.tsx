@@ -575,9 +575,10 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
       </Sheet>
 
       <div
-        className={`flex flex-1 flex-col overflow-hidden bg-white transition-all duration-700 ease-out md:rounded-lg md:m-2 ${
-          animate ? "opacity-100 scale-100 transform-none" : "opacity-0 scale-0 transform origin-center"
-        }`}
+        className={cn(
+          "flex flex-1 flex-col overflow-hidden bg-white transition-opacity duration-700 ease-out md:rounded-lg md:m-2",
+          animate ? "opacity-100" : "opacity-0",
+        )}
       >
         {/* Header - no rounded corners on mobile */}
         <header className="flex items-center justify-between border-b border-[#f5f4f3] bg-white px-4 py-2.5 md:rounded-t-lg sticky top-0 z-10 min-h-[64px]">

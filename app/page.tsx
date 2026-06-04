@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Building2, Eye, EyeOff, Loader2, Lock, Mail, User, type LucideIcon } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,23 +23,37 @@ const authPasswordToggleIconClassName = "h-5 w-5 text-neutral-400/60"
 const authActionsClassName = "flex flex-col gap-4"
 
 function AuthSubmitButton({
-  children,
+  label,
+  hoverLabel,
+  loading,
+  loadingLabel,
   disabled,
 }: {
-  children: React.ReactNode
+  label: string
+  hoverLabel: string
+  loading: boolean
+  loadingLabel: string
   disabled?: boolean
 }) {
   return (
     <Button
       type="submit"
       disabled={disabled}
-      className="group relative h-11 w-full overflow-hidden rounded-full border-2 border-primary bg-primary text-white hover:bg-primary"
+      className="group h-11 w-full cursor-pointer rounded-full border-2 border-primary bg-primary text-white hover:bg-primary"
     >
-      <span
-        aria-hidden
-        className="absolute inset-0 z-0 origin-center scale-0 rounded-full bg-black transition-transform duration-300 ease-out group-hover:scale-100"
-      />
-      <span className="relative z-10 inline-flex items-center justify-center gap-2 text-white">{children}</span>
+      {loading ? (
+        <span className="inline-flex items-center justify-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          {loadingLabel}
+        </span>
+      ) : (
+        <span className="relative block h-5 overflow-hidden">
+          <span className="flex flex-col items-center transition-transform duration-300 ease-out group-hover:-translate-y-1/2">
+            <span className="flex h-5 items-center leading-5">{label}</span>
+            <span className="flex h-5 items-center leading-5">{hoverLabel}</span>
+          </span>
+        </span>
+      )}
     </Button>
   )
 }
@@ -169,6 +184,7 @@ function GoogleSignInButton({ isLoading }: { isLoading: boolean }) {
       variant="outline"
       className="h-11 w-full cursor-pointer rounded-full border-2 border-neutral-200 bg-white hover:border-primary hover:bg-neutral-50"
       disabled={isLoading}
+      onClick={() => toast.info("Google coming soon. We didn't add this feature yet.")}
     >
       <svg viewBox="0 0 24 24" className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -391,16 +407,13 @@ export default function AuthPage() {
               />
 
               <div className={authActionsClassName}>
-                <AuthSubmitButton disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Creating account...
-                    </>
-                  ) : (
-                    "Create Account"
-                  )}
-                </AuthSubmitButton>
+                <AuthSubmitButton
+                  label="Create Account"
+                  hoverLabel="Join Luz"
+                  loading={isLoading}
+                  loadingLabel="Creating account..."
+                  disabled={isLoading}
+                />
                 <AuthSocialDivider />
                 <GoogleSignInButton isLoading={isLoading} />
               </div>
@@ -436,16 +449,13 @@ export default function AuthPage() {
               />
 
               <div className={authActionsClassName}>
-                <AuthSubmitButton disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Logging in...
-                    </>
-                  ) : (
-                    "Login"
-                  )}
-                </AuthSubmitButton>
+                <AuthSubmitButton
+                  label="Login"
+                  hoverLabel="Sign in"
+                  loading={isLoading}
+                  loadingLabel="Logging in..."
+                  disabled={isLoading}
+                />
                 <AuthSocialDivider />
                 <GoogleSignInButton isLoading={isLoading} />
               </div>

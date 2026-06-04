@@ -9,6 +9,9 @@ const nextConfig = {
   async redirects() {
     return [{ source: "/login", destination: "/", permanent: true }]
   },
+  async rewrites() {
+    return [{ source: "/register", destination: "/" }]
+  },
 }
 
 export default nextConfig

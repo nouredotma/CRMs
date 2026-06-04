@@ -56,7 +56,7 @@ export function ModernPieChart({
       <CardContent className="flex-1 p-4 pt-2 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[240px]"
+          className="mx-auto h-[240px] w-full max-h-[240px]"
         >
           <PieChart>
             <ChartTooltip
