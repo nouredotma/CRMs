@@ -120,7 +120,7 @@ export default function DashboardPage() {
             {getGreeting()}, <span className="text-primary">{firstName}</span>
           </h2>
           <p className="text-xs text-neutral-500">
-            Here is what is happening today.
+            Your Nextera overview — clients, leads, projects, and billing today.
           </p>
         </div>
 
@@ -488,6 +488,8 @@ export default function DashboardPage() {
         {/* User Growth Line Chart */}
         <ModernLineChart 
           data={userGrowthData} 
+          title="New Leads"
+          description="Leads added this week"
           trendPercentage={18}
         />
 

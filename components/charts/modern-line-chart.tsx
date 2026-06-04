@@ -30,7 +30,7 @@ export interface ModernLineChartProps {
 
 const chartConfig = {
   users: {
-    label: "Users",
+    label: "Leads",
     color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig

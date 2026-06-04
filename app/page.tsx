@@ -5,7 +5,8 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Building2, Eye, EyeOff, Loader2, Lock, Mail, User, type LucideIcon } from "lucide-react"
+import { Eye, EyeOff, Loader2, Lock, Mail, User, type LucideIcon } from "lucide-react"
+import { COMPANY_NAME, DEFAULT_LOGIN_EMAIL } from "@/lib/company"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -224,7 +225,6 @@ export default function AuthPage() {
     fullName: "",
     email: "",
     password: "",
-    companyName: "",
   })
 
   useEffect(() => {
@@ -279,12 +279,7 @@ export default function AuthPage() {
     setError("")
 
     try {
-      if (
-        !registerData.fullName ||
-        !registerData.email ||
-        !registerData.password ||
-        !registerData.companyName
-      ) {
+      if (!registerData.fullName || !registerData.email || !registerData.password) {
         throw new Error("All fields are required")
       }
 
@@ -292,12 +287,8 @@ export default function AuthPage() {
         throw new Error("Password must be at least 6 characters")
       }
 
-      await registerUser(
-        registerData.fullName,
-        registerData.email,
-        registerData.password,
-        registerData.companyName,
-      )
+      await registerUser(registerData.fullName, registerData.email, registerData.password)
+      router.push("/dashboard")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed")
     } finally {
@@ -316,21 +307,23 @@ export default function AuthPage() {
         <div className="relative m-2 min-h-0 flex-1 overflow-hidden rounded-lg bg-black">
           <div className="logo-container absolute top-8 left-8 z-10">
             <div className="ball" />
-            <h2 className="logo-text text-2xl font-bold text-white">Luz</h2>
+            <h2 className="logo-text text-2xl font-bold text-white">{COMPANY_NAME}</h2>
           </div>
 
           <div className="absolute inset-0 z-10 flex items-center justify-center">
             <div className="max-w-md px-6 text-center">
               <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
-                Simplifiez votre entreprise
+                Run {COMPANY_NAME} from one place
               </h1>
-              <p className="mt-4 text-lg text-white/80">Une plateforme. Contrôle complet.</p>
+              <p className="mt-4 text-lg text-white/80">
+                Clients, leads, projects, campaigns, invoices, and documents — your internal CRM.
+              </p>
             </div>
           </div>
 
           <div className="absolute bottom-6 left-6 z-10 flex items-center">
-            <img src="/logo.png" alt="Ouz Logo" className="h-8 w-auto" />
-            <span className="ml-2 text-sm font-medium text-white">by nordix</span>
+            <img src="/logo.png" alt={`${COMPANY_NAME} logo`} className="h-8 w-auto" />
+            <span className="ml-2 text-sm font-medium text-white">{COMPANY_NAME}</span>
           </div>
         </div>
       </div>
@@ -344,12 +337,12 @@ export default function AuthPage() {
         <div className="w-full max-w-md space-y-6 py-4">
           <div className="space-y-1 text-center">
             <h2 className="text-3xl font-bold">
-              {isRegister ? "Create your Luz account 👋" : "Welcome to Luz 👋"}
+              {isRegister ? `Join ${COMPANY_NAME} 👋` : `Welcome to ${COMPANY_NAME} 👋`}
             </h2>
             <p className="text-neutral-500">
               {isRegister
-                ? "Register as an administrator to access your dashboard"
-                : "Log in to your account to continue"}
+                ? "Create your team account for the Nextera workspace"
+                : "Sign in to manage clients, projects, and billing"}
             </p>
           </div>
 
@@ -377,7 +370,7 @@ export default function AuthPage() {
                 label="Email"
                 icon={Mail}
                 type="email"
-                placeholder="name@example.com"
+                placeholder={DEFAULT_LOGIN_EMAIL}
                 autoComplete="email"
                 value={registerData.email}
                 onChange={handleRegisterChange}
@@ -395,21 +388,10 @@ export default function AuthPage() {
                 showToggle={!!registerData.password}
               />
 
-              <AuthInputWithIcon
-                id="companyName"
-                name="companyName"
-                label="Company Name"
-                icon={Building2}
-                placeholder="Acme Inc."
-                value={registerData.companyName}
-                onChange={handleRegisterChange}
-                disabled={isLoading}
-              />
-
               <div className={authActionsClassName}>
                 <AuthSubmitButton
                   label="Create Account"
-                  hoverLabel="Join Luz"
+                  hoverLabel={`Join ${COMPANY_NAME}`}
                   loading={isLoading}
                   loadingLabel="Creating account..."
                   disabled={isLoading}
@@ -430,7 +412,7 @@ export default function AuthPage() {
                 label="Email"
                 icon={Mail}
                 type="email"
-                placeholder="name@example.com"
+                placeholder={DEFAULT_LOGIN_EMAIL}
                 autoComplete="email"
                 value={loginData.email}
                 onChange={handleLoginChange}

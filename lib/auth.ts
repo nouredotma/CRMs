@@ -1,4 +1,6 @@
-// Mock authentication functions for local storage
+// Mock authentication for Nextera (single-company CRM)
+
+import { COMPANY, COMPANY_NAME, DEFAULT_LOGIN_EMAIL, DEFAULT_LOGIN_PASSWORD } from "@/lib/company"
 
 // Types
 interface User {
@@ -21,31 +23,22 @@ interface Company {
   logo?: string
 }
 
-// Mock users for testing
+const nexteraCompany: Company = { ...COMPANY }
+
+// Default admin for local development
 const mockUsers: (User & { password: string })[] = [
   {
     id: "user-1",
     fullName: "Noureddine Elm",
-    email: "admin@luz.com",
-    password: "password123",
+    email: DEFAULT_LOGIN_EMAIL,
+    password: DEFAULT_LOGIN_PASSWORD,
     role: "Admin",
-    companyId: "company-1",
+    companyId: COMPANY.id,
     avatar: "/me.webp",
   },
 ]
 
-// Mock companies
-const mockCompanies = [
-  {
-    id: "company-1",
-    name: "L u z",
-    ice: "123456789",
-    rc: "RC123456",
-    address: "123 Main St, City",
-    phone: "+1234567890",
-    website: "https://acme.example.com",
-  },
-]
+const mockCompanies: Company[] = [nexteraCompany]
 
 // Helper to generate IDs
 const generateId = () => `id-${Math.random().toString(36).substring(2, 9)}`
@@ -58,30 +51,19 @@ export const isAuthenticated = (): boolean => {
   return !!user
 }
 
-// Register a new user (admin only)
+// Register a new Nextera team member (always tied to Nextera)
 export const registerUser = async (
   fullName: string,
   email: string,
   password: string,
-  companyName: string,
 ): Promise<User> => {
-  // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
-  // Check if email already exists
   const existingUser = mockUsers.find((user) => user.email === email)
   if (existingUser) {
     throw new Error("Email already in use")
   }
 
-  // Create new company
-  const companyId = generateId()
-  const company: Company = {
-    id: companyId,
-    name: companyName,
-  }
-
-  // Create new user (admin role)
   const userId = generateId()
   const user: User & { password: string } = {
     id: userId,
@@ -89,33 +71,28 @@ export const registerUser = async (
     email,
     password,
     role: "Admin",
-    companyId,
+    companyId: COMPANY.id,
   }
 
-  // Store in localStorage
   const { password: _, ...userWithoutPassword } = user
   localStorage.setItem("user", JSON.stringify(userWithoutPassword))
-  localStorage.setItem("company", JSON.stringify(company))
+  localStorage.setItem("company", JSON.stringify(nexteraCompany))
 
   return userWithoutPassword
 }
 
 // Login user
 export const loginUser = async (email: string, password: string): Promise<User> => {
-  // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
-  // Find user by email and password
   const user = mockUsers.find((user) => user.email === email && user.password === password)
 
   if (!user) {
     throw new Error("Invalid email or password")
   }
 
-  // Find company
-  const company = mockCompanies.find((company) => company.id === user.companyId)
+  const company = mockCompanies.find((c) => c.id === user.companyId)
 
-  // Store in localStorage
   const { password: _, ...userWithoutPassword } = user
   localStorage.setItem("user", JSON.stringify(userWithoutPassword))
 
@@ -131,21 +108,20 @@ export const logoutUser = (): void => {
   localStorage.removeItem("user")
 }
 
-export const updateCompanyProfile = async (formData: any): Promise<Company> => {
-  // Simulate API delay
+export const updateCompanyProfile = async (formData: Record<string, unknown>): Promise<Company> => {
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
-  // Get existing company from localStorage
   const companyJson = localStorage.getItem("company")
-  let company: Company = companyJson ? JSON.parse(companyJson) : { id: generateId(), name: "New Company" }
+  let company: Company = companyJson
+    ? JSON.parse(companyJson)
+    : { ...nexteraCompany, name: COMPANY_NAME }
 
-  // Update company with form data
   company = {
     ...company,
+    name: COMPANY_NAME,
     ...formData,
   }
 
-  // Store updated company in localStorage
   localStorage.setItem("company", JSON.stringify(company))
 
   return company

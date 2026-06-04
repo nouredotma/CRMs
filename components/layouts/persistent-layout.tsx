@@ -25,6 +25,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   Bell,
+  Target,
+  FolderKanban,
+  Megaphone,
   Sun,
   Moon,
   Monitor,
@@ -37,10 +40,12 @@ import { useTheme } from "next-themes"
 import { Input } from "@/components/ui/input"
 
 import { logoutUser } from "@/lib/auth"
+import { COMPANY_NAME } from "@/lib/company"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Loader } from "@/components/loader"
+import { PageAnimation } from "@/components/page-animation"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,7 +73,7 @@ const dashboardItem: SidebarItem = {
   title: "Dashboard",
   icon: Home,
   path: "/dashboard",
-  description: "KPI overview, charts, Top 10 clients",
+  description: "Nextera overview — revenue, leads, projects, clients",
 }
 
 // Update the sidebarGroups to use static strings
@@ -77,10 +82,28 @@ const sidebarGroups: SidebarGroup[] = [
     label: "Sales & CRM",
     items: [
       {
+        title: "Leads",
+        icon: Target,
+        path: "/leads",
+        description: "Prospects and pipeline stages",
+      },
+      {
         title: "Clients",
         icon: Users,
         path: "/clients",
-        description: "CRM Lite: add/edit/delete; billing history",
+        description: "Active client accounts and billing history",
+      },
+      {
+        title: "Projects",
+        icon: FolderKanban,
+        path: "/projects",
+        description: "Client projects, milestones, and delivery",
+      },
+      {
+        title: "Campaigns",
+        icon: Megaphone,
+        path: "/campaigns",
+        description: "Marketing and outreach campaigns",
       },
       {
         title: "Products",
@@ -160,29 +183,27 @@ const sidebarGroups: SidebarGroup[] = [
       },
     ],
   },
+]
 
+/** Account menu (user dropdown) — not shown in sidebar */
+const userMenuItems: SidebarItem[] = [
   {
-    label: "My Luz",
-    items: [
-      {
-        title: "Settings",
-        icon: Settings,
-        path: "/settings",
-        description: "Company info, PDF, taxes, language",
-      },
-      {
-        title: "Team Management",
-        icon: Users2,
-        path: "/users",
-        description: "Invite members; role-based permissions",
-      },
-      {
-        title: "My Space",
-        icon: FolderOpen,
-        path: "/my-space",
-        description: "Manage your personal space",
-      },
-    ],
+    title: "Settings",
+    icon: Settings,
+    path: "/settings",
+    description: "Nextera profile, PDF templates, taxes, language",
+  },
+  {
+    title: "Team Management",
+    icon: Users2,
+    path: "/users",
+    description: "Invite members; role-based permissions",
+  },
+  {
+    title: "My Space",
+    icon: FolderOpen,
+    path: "/my-space",
+    description: "Manage your personal space",
   },
 ]
 
@@ -332,9 +353,8 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userData, setUserData] = useState<{ fullName: string; role: string; avatar?: string } | null>(null)
-  const [companyName, setCompanyName] = useState("Company")
+  const [companyName, setCompanyName] = useState(COMPANY_NAME)
   const [currentPageTitle, setCurrentPageTitle] = useState("")
-  const [animate, setAnimate] = useState(false)
   const [loading, setLoading] = useState(true)
   const [currentLanguage, setCurrentLanguage] = useState(languages[0])
   const [isDesktop, setIsDesktop] = useState(true)
@@ -383,7 +403,7 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
     const companyJson = localStorage.getItem("company")
     if (companyJson) {
       const company = JSON.parse(companyJson)
-      setCompanyName(company.name || "Company")
+      setCompanyName(company.name || COMPANY_NAME)
     }
 
     // Set current page title based on pathname
@@ -391,30 +411,23 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
     if (pathname === dashboardItem.path) {
       setCurrentPageTitle(dashboardItem.title)
     } else {
-      // Check all groups
-      for (const group of sidebarGroups) {
-        const item = group.items.find((item) => item.path === pathname)
-        if (item) {
-          setCurrentPageTitle(item.title)
-          break
+      const userMenuItem = userMenuItems.find((item) => item.path === pathname)
+      if (userMenuItem) {
+        setCurrentPageTitle(userMenuItem.title)
+      } else {
+        for (const group of sidebarGroups) {
+          const item = group.items.find((item) => item.path === pathname)
+          if (item) {
+            setCurrentPageTitle(item.title)
+            break
+          }
         }
       }
     }
   }, [pathname, router])
 
-  // Close mobile menu when navigating
   useEffect(() => {
     setMobileOpen(false)
-
-    // Reset animation state when navigating
-    setAnimate(false)
-
-    // Trigger animation after a short delay
-    const timer = setTimeout(() => {
-      setAnimate(true)
-    }, 100)
-
-    return () => clearTimeout(timer)
   }, [pathname])
 
   const handleLogout = () => {
@@ -531,7 +544,7 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
           <div className="flex-1 flex flex-col min-h-0 overflow-x-hidden">
             {/* Sidebar content - with hidden scrollbar */}
             <div className="relative flex-1 overflow-hidden">
-              <div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-full pb-4">
+              <div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-full pb-8">
                 <SidebarContent />
               </div>
               <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-[#f5f4f3] to-transparent pointer-events-none"></div>
@@ -563,7 +576,7 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
             <div className="flex-1 flex flex-col min-h-0 overflow-x-hidden">
               {/* Mobile sidebar content - with flex-1 to push logout to bottom and hidden scrollbar */}
               <div className="relative flex-1 overflow-hidden">
-                <div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-full pb-4">
+                <div className="overflow-y-auto overflow-x-hidden hide-scrollbar h-full pb-8">
                   <SidebarContent isMobileSidebar={true} />
                 </div>
               </div>
@@ -574,11 +587,9 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
         </SheetContent>
       </Sheet>
 
-      <div
-        className={cn(
-          "flex flex-1 flex-col overflow-hidden bg-white transition-opacity duration-700 ease-out md:rounded-lg md:m-2",
-          animate ? "opacity-100" : "opacity-0",
-        )}
+      <PageAnimation
+        key={pathname}
+        className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white md:m-2 md:rounded-lg"
       >
         {/* Header - no rounded corners on mobile */}
         <header className="flex items-center justify-between border-b border-[#f5f4f3] bg-white px-4 py-2.5 md:rounded-t-lg sticky top-0 z-10 min-h-[64px]">
@@ -680,24 +691,24 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
                 <div className="max-h-[300px] overflow-y-auto hide-scrollbar">
                   {[
                     {
-                      title: "New client registered",
-                      desc: "Noureddine Elm just signed up as a new Admin.",
+                      title: "New lead — Horizon Retail",
+                      desc: "Added to pipeline from campaign landing page.",
                       time: "2m ago",
                       read: false,
                       icon: <UserPlus className="h-4 w-4 text-blue-500" />,
                       iconBg: "bg-blue-50",
                     },
                     {
-                      title: "Invoice #INV-2024-001",
-                      desc: "Payment of $1,250.00 confirmed by Acme Inc.",
+                      title: "Invoice INV-2026-0142 paid",
+                      desc: "Atlas Digital — $4,800.00 received.",
                       time: "1h ago",
                       read: false,
                       icon: <CheckCircle2 className="h-4 w-4 text-green-500" />,
                       iconBg: "bg-green-50",
                     },
                     {
-                      title: "Inventory Alert",
-                      desc: "5 products are below their minimum stock level.",
+                      title: "Project deadline",
+                      desc: "Summit Logistics onboarding due in 3 days.",
                       time: "3h ago",
                       read: true,
                       icon: <AlertTriangle className="h-4 w-4 text-orange-500" />,
@@ -757,7 +768,7 @@ export function PersistentLayout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 overflow-y-auto p-3 md:p-4 overscroll-none hide-scrollbar">
           {children}
         </main>
-      </div>
+      </PageAnimation>
     </div>
   )
 }

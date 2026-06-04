@@ -12,10 +12,10 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: {
-    default: "Luz",
-    template: "%s | Luz",
+    default: "Nextera",
+    template: "%s | Nextera",
   },
-  description: "Log in to your Luz account",
+  description: "Nextera CRM — clients, leads, projects, invoices, and more",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
